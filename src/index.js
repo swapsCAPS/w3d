@@ -28,6 +28,7 @@ import './stylesheet.less'
 
 import * as envMapImg from './assets/env-map.jpg'
 
+
 const ASPECT_RATIO = window.innerWidth / window.innerHeight
 const NEAR         = 0.1
 const FAR          = 10000
@@ -92,12 +93,37 @@ const camera = new PerspectiveCamera(VIEW_ANGLE, ASPECT_RATIO, NEAR, FAR)
 camera.up = new Vector3( 0, 0, 1 )
 camera.position.set(150, 250, 200)
 camera.lookAt(cube.position)
+window.onkeydown = ({keyCode}) => {
+  console.log('keyCode', keyCode)
+  switch(keyCode) {
+    case 87:
+      camera.position.y += 2
+      break
+    case 83:
+      camera.position.y -= 2
+      break
+    case 65:
+      camera.position.x -= 2
+      break
+    case 68:
+      camera.position.x += 2
+      break
+    case 33:
+      camera.position.z += 2
+      break
+    case 34:
+      camera.position.z -= 2
+      break
+
+  }
+  camera.lookAt(cube.position)
+}
 
 const scaleFrom = { x: 1,   y: 1,   z: 1 }
 const scaleTo   = { x: 1.8, y: 1.8, z: 1.8 }
 const scale     = { x: 1,   y: 1,   z: 1 }
-const breathIn  = new TWEEN.Tween( scale ).to( scaleTo, 3500 )
-const breathOut = new TWEEN.Tween( scale ).to( scaleFrom, 2000 )
+const breathIn  = new TWEEN.Tween( scale ).easing(TWEEN.Easing.Quadratic.Out).to( scaleTo, 3500 )
+const breathOut = new TWEEN.Tween( scale ).easing(TWEEN.Easing.Quadratic.Out).to( scaleFrom, 2000 )
 const breathHandler = () => {
   cube.scale.x = scale.x
   cube.scale.y = scale.y
