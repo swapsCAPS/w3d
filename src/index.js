@@ -7,6 +7,7 @@ import {
   MeshBasicMaterial,
   MeshStandardMaterial,
   MeshLambertMaterial,
+  Clock,
   PerspectiveCamera,
   Scene,
   WebGLRenderer,
@@ -18,6 +19,7 @@ import {
   SpotLight,
   PointLightHelper,
   SpotLightHelper,
+  AnimationMixer,
   CubeTextureLoader,
   TextureLoader,
   RepeatWrapping,
@@ -48,11 +50,17 @@ const VIEW_ANGLE   = 35
 const renderer   = new WebGLRenderer( { antialias: true } )
 const scene      = new Scene()
 const gltfLoader = new GLTFLoader()
+const mixer      = new AnimationMixer( scene )
+const clock      = new Clock()
 
 renderer.setClearColor(0x4f4f4f)
 renderer.setSize( window.innerWidth, window.innerHeight )
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type    = PCFSoftShadowMap
+
+// NOTE: from the docs: always configure WebGLRenderer as follows when using glTF
+renderer.gammaOutput = true
+renderer.gammaFactor = 2.2
 
 document.body.appendChild( renderer.domElement )
 
@@ -124,7 +132,7 @@ window.onkeydown = ({keyCode}) => {
 async.parallel({
   small: (cb) => {
     gltfLoader.load(cubeSmall, (gltf) => {
-      cb(null, gltf.scene)
+      cb(null, gltf)
     }, undefined, cb)
   },
 
@@ -136,7 +144,7 @@ async.parallel({
 
   ico: (cb) => {
     gltfLoader.load(icoSphere, (gltf) => {
-      cb(null, gltf.scene)
+      cb(null, gltf)
     }, undefined, cb)
   },
 
@@ -144,10 +152,12 @@ async.parallel({
   if (error) return console.error(error)
   const pLight = new THREE.PointLight( 0x0000ff, 1, 100 )
   pLight.castShadow = true
-  small.position.set( 0, 0, 50 )
-  small.receiveShadow = true
-  small.castShadow = true
-  scene.add( small )
+
+  const smallScene = small.scene
+  smallScene.position.set( 0, 0, 50 )
+  smallScene.receiveShadow = true
+  smallScene.castShadow = true
+  scene.add( smallScene )
   new MeshLambertMaterial( { color: 0xfcfcfc, side: THREE.DoubleSide } )
 
   big.position.set( 0, 0, 50 )
@@ -157,42 +167,46 @@ async.parallel({
 
   const icoGroup = new Group()
 
-  ico.position.set(0, 0, 0)
-  ico.castShadow    = false
-  ico.receiveShadow = false
+  const icoScene = ico.scene
+  icoScene.position.set(0, 0, 50)
+  icoScene.castShadow    = false
+  icoScene.receiveShadow = false
   pLight.position.set(0, 0, 0)
-  // icoGroup.add(ico)
+  icoGroup.add(icoScene)
   icoGroup.add(pLight)
+  console.log('ico', ico)
+  mixer.clipAction( ico.animations[0], icoScene ).setDuration(2).play()
+  mixer.clipAction( small.animations[0], smallScene ).setDuration(2).play()
   scene.add( icoGroup )
 
-  const rotate = () => {
-    small.rotation.z += 0.005
-    setTimeout(rotate, 10)
-  }
-  rotate()
+  console.log(smallScene)
 
-
-  const from     = { x: 0,   y: 0,   z: 48 }
-  const to       = { x: 0,   y: 0,   z: 52 }
-  const position = { x: 0,   y: 0,   z: 50 }
-  const up       = new TWEEN.Tween( position ).easing(TWEEN.Easing.Linear.None).to( to,   1000 )
-  const down     = new TWEEN.Tween( position ).easing(TWEEN.Easing.Linear.None).to( from, 1000 )
-  const handler = () => {
-    icoGroup.position.set(0, 0, position.z)
-  }
-  up.onUpdate(handler)
-  down.onUpdate(handler)
-  up.chain(down)
-  down.chain(up)
-  up.start()
+  // const from     = { x: 0,   y: 0,   z: 48 }
+  // const to       = { x: 0,   y: 0,   z: 52 }
+  // const position = { x: 0,   y: 0,   z: 50 }
+  // const up       = new TWEEN.Tween( position ).easing(TWEEN.Easing.Linear.None).to( to,   1000 )
+  // const down     = new TWEEN.Tween( position ).easing(TWEEN.Easing.Linear.None).to( from, 1000 )
+  // const handler = () => {
+    // icoGroup.position.set(0, 0, position.z)
+  // }
+  // up.onUpdate(handler)
+  // down.onUpdate(handler)
+  // up.chain(down)
+  // down.chain(up)
+  // // up.start()
 
   function animate() {
     requestAnimationFrame( animate )
+    render()
+  }
+  animate()
+
+  function render() {
+    mixer.update( clock.getDelta() )
     TWEEN.update()
 
     camera.lookAt(new Vector3(0, 0, 37))
     renderer.render( scene, camera )
   }
-  animate()
 })
 
