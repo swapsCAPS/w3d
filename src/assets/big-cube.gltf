@@ -3,9 +3,9 @@
         {
             "bufferView" : 0,
             "componentType" : 5123,
-            "count" : 288,
+            "count" : 1776,
             "max" : [
-                119
+                935
             ],
             "min" : [
                 0
@@ -15,7 +15,7 @@
         {
             "bufferView" : 1,
             "componentType" : 5126,
-            "count" : 120,
+            "count" : 936,
             "max" : [
                 50.0,
                 50.0,
@@ -31,7 +31,7 @@
         {
             "bufferView" : 2,
             "componentType" : 5126,
-            "count" : 120,
+            "count" : 936,
             "max" : [
                 1.0,
                 1.0,
@@ -52,26 +52,26 @@
     "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 576,
+            "byteLength" : 3552,
             "byteOffset" : 0,
             "target" : 34963
         },
         {
             "buffer" : 0,
-            "byteLength" : 1440,
-            "byteOffset" : 576,
+            "byteLength" : 11232,
+            "byteOffset" : 3552,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 1440,
-            "byteOffset" : 2016,
+            "byteLength" : 11232,
+            "byteOffset" : 14784,
             "target" : 34962
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 3456,
+            "byteLength" : 26016,
             "uri" : "big-cube.bin"
         }
     ],
@@ -80,11 +80,12 @@
             "name" : "Material",
             "pbrMetallicRoughness" : {
                 "baseColorFactor" : [
-                    0.800000011920929,
-                    0.800000011920929,
-                    0.800000011920929,
+                    0.7913016676902771,
+                    0.7912922501564026,
+                    0.7912998795509338,
                     1.0
-                ]
+                ],
+                "metallicFactor" : 0.0
             }
         }
     ],

@@ -1,29 +1,31 @@
 import _ from 'underscore'
 import {
-  BoxGeometry,
+  AmbientLight,
+  AnimationMixer,
+  AnimationObjectGroup,
   BasicShadowMap,
-  PCFSoftShadowMap,
+  BoxGeometry,
+  Clock,
+  CubeTextureLoader,
+  DirectionalLight,
+  Fog,
+  Group,
   Mesh,
   MeshBasicMaterial,
-  MeshStandardMaterial,
   MeshLambertMaterial,
-  Clock,
-  PerspectiveCamera,
-  Scene,
-  WebGLRenderer,
-  AmbientLight,
-  DirectionalLight,
+  MeshStandardMaterial,
   Object3D,
-  Group,
+  PCFSoftShadowMap,
+  PerspectiveCamera,
   PointLight,
-  SpotLight,
   PointLightHelper,
-  SpotLightHelper,
-  AnimationMixer,
-  CubeTextureLoader,
-  TextureLoader,
   RepeatWrapping,
+  Scene,
+  SpotLight,
+  SpotLightHelper,
+  TextureLoader,
   Vector3,
+  WebGLRenderer,
 } from 'three'
 import TWEEN from '@tweenjs/tween.js'
 import * as THREE from 'three'
@@ -46,12 +48,14 @@ const ASPECT_RATIO = window.innerWidth / window.innerHeight
 const NEAR         = 0.1
 const FAR          = 10000
 const VIEW_ANGLE   = 35
+let fogFar       = 950
 
 const renderer   = new WebGLRenderer( { antialias: true } )
 const scene      = new Scene()
 const gltfLoader = new GLTFLoader()
 const mixer      = new AnimationMixer( scene )
 const clock      = new Clock()
+scene.fog = new Fog(0x555555, NEAR, fogFar)
 
 renderer.setClearColor(0x4f4f4f)
 renderer.setSize( window.innerWidth, window.innerHeight )
@@ -75,8 +79,9 @@ floor.position.set( 0, 0, 0 )
 floor.receiveShadow = true
 scene.add( floor )
 
-const aLight = new AmbientLight( 0xFFFFFF, 0.5)
-aLight.position.set( 0, 0, 1000 )
+let   aLightIntensity = 0.5
+const aLight = new AmbientLight( 0xFFFFFF, aLightIntensity)
+aLight.position.set( 0, 0, 100 )
 
 const dLight = new DirectionalLight( 0xFFFFFF, 0.5)
 dLight.position.set( 0, 0, 1000 )
@@ -96,8 +101,7 @@ spLight2.castShadow = true
 const spLightHelper1 = new SpotLightHelper( spLight1 )
 const spLightHelper2 = new SpotLightHelper( spLight2 )
 
-scene.add( aLight )
-// scene.add( dLight )
+scene.add( dLight )
 // scene.add( spLight1 )
 // scene.add( spLight2 )
 // scene.add( spLightHelper1 )
@@ -122,10 +126,13 @@ window.onkeydown = ({keyCode}) => {
       camera.position.x += 2
       break
     case 33:
-      camera.position.z += 2
+
+      aLight.intensity += 0.2
+      console.log('aLight.intensity', aLight.intensity)
       break
     case 34:
-      camera.position.z -= 2
+      aLight.intensity -= 0.2
+      console.log('aLight.intensity', aLight.intensity)
       break
 
   }
@@ -159,7 +166,12 @@ async.parallel({
   smallScene.position.set( 0, 0, 50 )
   smallScene.traverse((node) => {
     if (node instanceof Mesh) {
-      node.castShadow = true
+
+      node.material = new MeshLambertMaterial({
+        color:             0xe6e6e6,
+        side: THREE.DoubleSide,
+      })
+      node.castShadow    = true
       node.receiveShadow = true
     }
   })
@@ -168,30 +180,48 @@ async.parallel({
   big.position.set( 0, 0, 50 )
   big.traverse((node) => {
     if (node instanceof Mesh) {
-      node.castShadow = true
+      node.material = new MeshLambertMaterial({
+        color:             0xe6e6e6,
+        side: THREE.DoubleSide,
+      })
+      node.castShadow    = true
       node.receiveShadow = true
     }
   })
   scene.add( big )
 
-  const icoGroup = new Group()
-
   const icoScene = ico.scene
   icoScene.position.set(0, 0, 50)
   icoScene.castShadow    = false
   icoScene.receiveShadow = false
-  const pLight = new THREE.PointLight( 0x2cbee7, 1, 1000 )
-  pLight.castShadow = true
-  pLight.position.set( 0, 0, 50 )
-  const pLightHelper1 = new PointLightHelper( pLight )
-  icoGroup.add(icoScene)
-  icoGroup.add(pLight)
-  icoGroup.add(pLightHelper1)
 
+  icoScene.traverse((node) => {
+    if (node instanceof Mesh) {
+      node.material = new MeshLambertMaterial({
+        color:             'white',
+        emissive:          '#2cbee7',
+        emissiveIntensity: 2.5,
+      })
+    }
+  })
+
+  const pLight = new THREE.PointLight( 0x2cbee7, 1, 10 )
+  pLight.castShadow = true
+  const pLightHelper1 = new PointLightHelper( pLight )
+
+  scene.add( icoScene )
+  scene.add( pLight )
+  // scene.add( pLightHelper1 )
+
+
+  const animationGroup = new AnimationObjectGroup(icoScene, pLight, pLightHelper1)
+  console.log('animationGroup', animationGroup)
   console.log('ico', ico)
-  mixer.clipAction( ico.animations[0], icoGroup ).setDuration(2).play()
+  mixer.clipAction( ico.animations[0], animationGroup ).setDuration(2).play()
+  mixer.clipAction( ico.animations[0], pLight ).setDuration(2).play()
   mixer.clipAction( small.animations[0], smallScene ).setDuration(4).play()
-  scene.add( icoGroup )
+
+  scene.add( aLight )
 
   function animate() {
     requestAnimationFrame( animate )
@@ -202,6 +232,8 @@ async.parallel({
   function render() {
     mixer.update( clock.getDelta() )
     TWEEN.update()
+
+    pLight.position.z += 50
 
     camera.lookAt(new Vector3(0, 0, 37))
     renderer.render( scene, camera )
