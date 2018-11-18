@@ -12,6 +12,8 @@ import {
   WebGLRenderer,
   AmbientLight,
   DirectionalLight,
+  Object3D,
+  Group,
   PointLight,
   SpotLight,
   PointLightHelper,
@@ -29,11 +31,9 @@ import async from 'async'
 
 import './stylesheet.less'
 
-import * as envMapImg from './assets/env-map.jpg'
-
-import * as cubeBig   from './assets/gltfs/cube-big.gltf'
-import * as cubeSmall from './assets/gltfs/cube-small.gltf'
-import * as icoSphere   from './assets/gltfs/icosphere.gltf'
+import * as cubeBig   from './assets/big-cube.gltf'
+import * as cubeSmall from './assets/small-cube.gltf'
+import * as icoSphere   from './assets/icosphere.gltf'
 
 const errorHandler = (error) => {
   console.error(error)
@@ -87,8 +87,8 @@ const spLightHelper2 = new SpotLightHelper( spLight2 )
 
 scene.add( aLight )
 // scene.add( dLight )
-scene.add( spLight1 )
-scene.add( spLight2 )
+// scene.add( spLight1 )
+// scene.add( spLight2 )
 // scene.add( spLightHelper1 )
 // scene.add( spLightHelper2 )
 
@@ -141,14 +141,29 @@ async.parallel({
   },
 
 }, (error, { small, big, ico } = {}) => {
+  if (error) return console.error(error)
+  const pLight = new THREE.PointLight( 0x0000ff, 1, 100 )
+  pLight.castShadow = true
   small.position.set( 0, 0, 50 )
+  small.receiveShadow = true
+  small.castShadow = true
   scene.add( small )
+  new MeshLambertMaterial( { color: 0xfcfcfc, side: THREE.DoubleSide } )
 
   big.position.set( 0, 0, 50 )
+  big.receiveShadow = true
+  big.castShadow = true
   scene.add( big )
 
-  ico.position.set( 0, 0, 50 )
-  scene.add( ico )
+  const icoGroup = new Group()
+
+  ico.position.set(0, 0, 0)
+  ico.castShadow    = false
+  ico.receiveShadow = false
+  pLight.position.set(0, 0, 0)
+  // icoGroup.add(ico)
+  icoGroup.add(pLight)
+  scene.add( icoGroup )
 
   const rotate = () => {
     small.rotation.z += 0.005
@@ -156,13 +171,14 @@ async.parallel({
   }
   rotate()
 
+
   const from     = { x: 0,   y: 0,   z: 48 }
   const to       = { x: 0,   y: 0,   z: 52 }
   const position = { x: 0,   y: 0,   z: 50 }
   const up       = new TWEEN.Tween( position ).easing(TWEEN.Easing.Linear.None).to( to,   1000 )
   const down     = new TWEEN.Tween( position ).easing(TWEEN.Easing.Linear.None).to( from, 1000 )
   const handler = () => {
-    ico.position.set(0, 0, position.z)
+    icoGroup.position.set(0, 0, position.z)
   }
   up.onUpdate(handler)
   down.onUpdate(handler)

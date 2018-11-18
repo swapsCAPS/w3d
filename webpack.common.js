@@ -2,19 +2,24 @@ const path               = require('path')
 const HtmlWebpackPlugin  = require('html-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const ThreeWebpackPlugin = require('@wildpeaks/three-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+
+const outputPath = path.resolve(__dirname, 'dist')
+
 
 module.exports = {
   entry: './src/index.js',
 
   output: {
-    filename: '[name].bundeltje.js',
-    chunkFilename: '[name].bundelje.js'
-    path:     path.resolve(__dirname, 'dist'),
+    filename:      '[name].bundeltje.js',
+    path:          outputPath,
   },
 
   plugins: [
     new CleanWebpackPlugin(['dist']),
     new ThreeWebpackPlugin(),
+    new CopyWebpackPlugin([ { from: './src/assets/*.bin', to: `${outputPath}`, flatten: true } ]),
+
     new HtmlWebpackPlugin({
       title: 'w3d',
     }),
@@ -48,7 +53,7 @@ module.exports = {
         ],
       },
       {
-        test:    /\.(gltf)$/i,
+        test:    /\.(gltf|bin)$/i,
         loaders: [
           'file-loader',
         ],
