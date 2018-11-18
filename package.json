@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "develop": "webpack-dev-server --open --config webpack.dev.js",
-    "convert": "find ./src/assets/objs -name \"*.obj\" -type f | cut -d '.' -f1 | xargs -i -p bash -c \"obj2gltf -i {} -o ./src/assets/gltfs/.\""
+    "convert": "node convert.js"
   },
   "author": "",
   "license": "ISC",
