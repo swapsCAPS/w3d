@@ -205,7 +205,7 @@ async.parallel({
     }
   })
 
-  const pLight = new THREE.PointLight( 0x2cbee7, 1, 10 )
+  const pLight = new THREE.PointLight( 0x2cbee7, 0.0001, 0.0001 )
   pLight.castShadow = true
   const pLightHelper1 = new PointLightHelper( pLight )
 
