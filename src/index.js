@@ -23,6 +23,8 @@ import {
 } from 'three'
 import TWEEN from '@tweenjs/tween.js'
 import * as THREE from 'three'
+import { OBJLoader } from 'three/examples/js/loaders/OBJLoader'
+
 
 import './stylesheet.less'
 

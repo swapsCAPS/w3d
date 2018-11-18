@@ -1,15 +1,34 @@
 const _        = require('underscore')
 const obj2gltf = require('obj2gltf')
 const fs       = require('fs')
+const util     = require('util')
 
-fs.readdir('./src/assets/objs', (error, files) => {
-  if (error) throw error
-  console.log('files', files)
-  Promise.all([
-    obj2gltf(files)
-      .then(function(gltf) {
-        const data = Buffer.from(JSON.stringify(gltf));
-        fs.writeFileSync(`./src/assets/objs/model.gltf`, data);
+DIR = './src/assets/objs'
+
+readdir = util.promisify(fs.readdir)
+writeFile = util.promisify(fs.writeFile)
+
+readdir(DIR)
+  .then((files) => {
+    files = _.filter(files, (file) => { return file.includes('.obj') })
+
+    console.log('files:')
+    _.each(files, console.log)
+
+    return Promise.all(
+      _.map(files, (file) => {
+        const fileName = file.split('.')[0]
+        const input = `${DIR}/${file}`
+
+        return obj2gltf(input).then( (gltf) => {
+          const data = Buffer.from(JSON.stringify(gltf));
+          const output = `./src/assets/gltfs/${fileName}.gltf`
+
+          return writeFile(output, data)
+        })
       })
-  ])
-})
+    )
+  })
+  .catch((error) => {
+    throw error
+  })
