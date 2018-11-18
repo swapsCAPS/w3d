@@ -75,6 +75,19 @@
             "uri" : "big-cube.bin"
         }
     ],
+    "materials" : [
+        {
+            "name" : "Material",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.800000011920929,
+                    0.800000011920929,
+                    0.800000011920929,
+                    1.0
+                ]
+            }
+        }
+    ],
     "meshes" : [
         {
             "name" : "Cube-Big",
@@ -84,7 +97,8 @@
                         "NORMAL" : 2,
                         "POSITION" : 1
                     },
-                    "indices" : 0
+                    "indices" : 0,
+                    "material" : 0
                 }
             ]
         }

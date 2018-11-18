@@ -236,6 +236,21 @@
             "uri" : "icosphere.bin"
         }
     ],
+    "materials" : [
+        {
+            "alphaMode" : "BLEND",
+            "name" : "Material.001",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.025328781455755234,
+                    0.5112581849098206,
+                    0.8003637194633484,
+                    0.5469108819961548
+                ],
+                "metallicFactor" : 0.0
+            }
+        }
+    ],
     "meshes" : [
         {
             "name" : "Icosphere",
@@ -245,7 +260,8 @@
                         "NORMAL" : 2,
                         "POSITION" : 1
                     },
-                    "indices" : 0
+                    "indices" : 0,
+                    "material" : 0
                 }
             ]
         }

@@ -157,13 +157,21 @@ async.parallel({
   const smallScene = small.scene
   console.log('small', small)
   smallScene.position.set( 0, 0, 50 )
-  smallScene.receiveShadow = true
-  smallScene.castShadow = true
+  smallScene.traverse((node) => {
+    if (node instanceof Mesh) {
+      node.castShadow = true
+      node.receiveShadow = true
+    }
+  })
   scene.add( smallScene )
 
   big.position.set( 0, 0, 50 )
-  big.receiveShadow = true
-  big.castShadow = true
+  big.traverse((node) => {
+    if (node instanceof Mesh) {
+      node.castShadow = true
+      node.receiveShadow = true
+    }
+  })
   scene.add( big )
 
   const icoGroup = new Group()
