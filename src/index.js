@@ -31,8 +31,9 @@ import './stylesheet.less'
 
 import * as envMapImg from './assets/env-map.jpg'
 
-import * as cubeBig from './assets/gltfs/cube-big.gltf'
+import * as cubeBig   from './assets/gltfs/cube-big.gltf'
 import * as cubeSmall from './assets/gltfs/cube-small.gltf'
+import * as icoSphere   from './assets/gltfs/icosphere.gltf'
 
 const errorHandler = (error) => {
   console.error(error)
@@ -42,10 +43,11 @@ const errorHandler = (error) => {
 const ASPECT_RATIO = window.innerWidth / window.innerHeight
 const NEAR         = 0.1
 const FAR          = 10000
-const VIEW_ANGLE   = 75
+const VIEW_ANGLE   = 35
 
-const renderer = new WebGLRenderer( { antialias: true } )
-const scene = new Scene()
+const renderer   = new WebGLRenderer( { antialias: true } )
+const scene      = new Scene()
+const gltfLoader = new GLTFLoader()
 
 renderer.setClearColor(0x4f4f4f)
 renderer.setSize( window.innerWidth, window.innerHeight )
@@ -61,34 +63,6 @@ const floor = new Mesh(
 floor.position.set( 0, 0, 0 )
 floor.receiveShadow = true
 scene.add( floor )
-
-const loader = new GLTFLoader()
-async.parallel({
-  cSmall: (cb) => {
-    loader.load(cubeSmall, (gltf) => {
-      cb(null, gltf.scene)
-    }, undefined, cb)
-  },
-
-  cBig: (cb) => {
-    loader.load(cubeBig, (gltf) => {
-      cb(null, gltf.scene)
-    }, undefined, cb)
-  },
-
-}, (error, { cSmall, cBig } = {}) => {
-  cSmall.position.set( 0, 0, 50 )
-  scene.add( cSmall )
-
-  cBig.position.set( 0, 0, 50 )
-  scene.add( cBig )
-
-  const rotate = () => {
-    cSmall.rotation.z += 0.005
-    setTimeout(rotate, 10)
-  }
-  rotate()
-})
 
 const aLight = new AmbientLight( 0xFFFFFF, 0.5)
 aLight.position.set( 0, 0, 1000 )
@@ -120,8 +94,7 @@ scene.add( spLight2 )
 
 const camera = new PerspectiveCamera(VIEW_ANGLE, ASPECT_RATIO, NEAR, FAR)
 camera.up = new Vector3( 0, 0, 1 )
-camera.position.set(66, 130, 112)
-camera.lookAt(floor.position)
+camera.position.set(66, 218, 118)
 window.onkeydown = ({keyCode}) => {
   console.log('keyCode', keyCode)
   switch(keyCode) {
@@ -148,25 +121,62 @@ window.onkeydown = ({keyCode}) => {
   console.log(camera.position)
 }
 
-const scaleFrom = { x: 1,   y: 1,   z: 1 }
-const scaleTo   = { x: 1.8, y: 1.8, z: 1.8 }
-const scale     = { x: 1,   y: 1,   z: 1 }
-const breathIn  = new TWEEN.Tween( scale ).easing(TWEEN.Easing.Quadratic.Out).to( scaleTo, 3500 )
-const breathOut = new TWEEN.Tween( scale ).easing(TWEEN.Easing.Quadratic.Out).to( scaleFrom, 2000 )
-const breathHandler = () => {
-}
-breathIn.onUpdate(breathHandler)
-breathOut.onUpdate(breathHandler)
-breathIn.chain(breathOut)
-breathOut.chain(breathIn)
-breathIn.start()
+async.parallel({
+  small: (cb) => {
+    gltfLoader.load(cubeSmall, (gltf) => {
+      cb(null, gltf.scene)
+    }, undefined, cb)
+  },
 
-function animate() {
-  requestAnimationFrame( animate )
-  TWEEN.update()
+  big: (cb) => {
+    gltfLoader.load(cubeBig, (gltf) => {
+      cb(null, gltf.scene)
+    }, undefined, cb)
+  },
 
+  ico: (cb) => {
+    gltfLoader.load(icoSphere, (gltf) => {
+      cb(null, gltf.scene)
+    }, undefined, cb)
+  },
 
-  renderer.render( scene, camera )
-}
-animate()
+}, (error, { small, big, ico } = {}) => {
+  small.position.set( 0, 0, 50 )
+  scene.add( small )
+
+  big.position.set( 0, 0, 50 )
+  scene.add( big )
+
+  ico.position.set( 0, 0, 50 )
+  scene.add( ico )
+
+  const rotate = () => {
+    small.rotation.z += 0.005
+    setTimeout(rotate, 10)
+  }
+  rotate()
+
+  const from     = { x: 0,   y: 0,   z: 48 }
+  const to       = { x: 0,   y: 0,   z: 52 }
+  const position = { x: 0,   y: 0,   z: 50 }
+  const up       = new TWEEN.Tween( position ).easing(TWEEN.Easing.Linear.None).to( to,   1000 )
+  const down     = new TWEEN.Tween( position ).easing(TWEEN.Easing.Linear.None).to( from, 1000 )
+  const handler = () => {
+    ico.position.set(0, 0, position.z)
+  }
+  up.onUpdate(handler)
+  down.onUpdate(handler)
+  up.chain(down)
+  down.chain(up)
+  up.start()
+
+  function animate() {
+    requestAnimationFrame( animate )
+    TWEEN.update()
+
+    camera.lookAt(new Vector3(0, 0, 37))
+    renderer.render( scene, camera )
+  }
+  animate()
+})
 

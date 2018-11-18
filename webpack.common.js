@@ -8,6 +8,7 @@ module.exports = {
 
   output: {
     filename: '[name].bundeltje.js',
+    chunkFilename: '[name].bundelje.js'
     path:     path.resolve(__dirname, 'dist'),
   },
 
