@@ -3,10 +3,10 @@ const obj2gltf = require('obj2gltf')
 const fs       = require('fs')
 const util     = require('util')
 
-DIR = './src/assets/objs'
+const DIR = './src/assets/objs'
 
-readdir = util.promisify(fs.readdir)
-writeFile = util.promisify(fs.writeFile)
+const readdir = util.promisify(fs.readdir)
+const writeFile = util.promisify(fs.writeFile)
 
 readdir(DIR)
   .then((files) => {
@@ -21,7 +21,7 @@ readdir(DIR)
         const input = `${DIR}/${file}`
 
         return obj2gltf(input).then( (gltf) => {
-          const data = Buffer.from(JSON.stringify(gltf));
+          const data = Buffer.from(JSON.stringify(gltf))
           const output = `./src/assets/gltfs/${fileName}.gltf`
 
           return writeFile(output, data)
