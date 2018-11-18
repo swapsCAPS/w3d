@@ -5,7 +5,7 @@ const util     = require('util')
 
 const DIR = './src/assets/objs'
 
-const readdir = util.promisify(fs.readdir)
+const readdir   = util.promisify(fs.readdir)
 const writeFile = util.promisify(fs.writeFile)
 
 readdir(DIR)

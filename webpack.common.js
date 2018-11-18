@@ -8,14 +8,14 @@ module.exports = {
 
   output: {
     filename: '[name].bundeltje.js',
-    path: path.resolve(__dirname, 'dist')
+    path:     path.resolve(__dirname, 'dist'),
   },
 
   plugins: [
     new CleanWebpackPlugin(['dist']),
     new ThreeWebpackPlugin(),
     new HtmlWebpackPlugin({
-      title: 'w3d'
+      title: 'w3d',
     }),
   ],
 
@@ -24,28 +24,34 @@ module.exports = {
       {
         test: /\.less$/,
         use: [{
-          loader: 'style-loader' // creates style nodes from JS strings
+          loader: 'style-loader', // creates style nodes from JS strings
         }, {
-          loader: 'css-loader' // translates CSS into CommonJS
+          loader: 'css-loader', // translates CSS into CommonJS
         }, {
-          loader: 'less-loader' // compiles Less to CSS
-        }]
+          loader: 'less-loader', // compiles Less to CSS
+        }],
       },
       {
-        test: /\.(jpe?g|png)$/i,
+        test:    /\.(jpe?g|png)$/i,
         loaders: [
-          "file-loader",
+          'file-loader',
           {
-            loader: "image-webpack-loader",
-            query: {
+            loader: 'image-webpack-loader',
+            query:  {
               pngquant: {
-                quality: "65-90",
-                speed: 4
-              }
-            }
-          }
-        ]
-      }
-    ]
-  }
+                quality: '65-90',
+                speed:   4,
+              },
+            },
+          },
+        ],
+      },
+      {
+        test:    /\.(gltf)$/i,
+        loaders: [
+          'file-loader',
+        ],
+      },
+    ],
+  },
 }

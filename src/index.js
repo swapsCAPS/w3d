@@ -23,12 +23,20 @@ import {
 } from 'three'
 import TWEEN from '@tweenjs/tween.js'
 import * as THREE from 'three'
-import { OBJLoader } from 'three/examples/js/loaders/OBJLoader'
+import { GLTFLoader } from 'three/examples/js/loaders/GLTFLoader'
+import async from 'async'
 
 
 import './stylesheet.less'
 
 import * as envMapImg from './assets/env-map.jpg'
+
+import * as cubeBig from './assets/gltfs/cube-big.gltf'
+import * as cubeSmall from './assets/gltfs/cube-small.gltf'
+
+const errorHandler = (error) => {
+  console.error(error)
+}
 
 
 const ASPECT_RATIO = window.innerWidth / window.innerHeight
@@ -37,6 +45,7 @@ const FAR          = 10000
 const VIEW_ANGLE   = 75
 
 const renderer = new WebGLRenderer( { antialias: true } )
+const scene = new Scene()
 
 renderer.setClearColor(0x4f4f4f)
 renderer.setSize( window.innerWidth, window.innerHeight )
@@ -51,14 +60,35 @@ const floor = new Mesh(
 )
 floor.position.set( 0, 0, 0 )
 floor.receiveShadow = true
+scene.add( floor )
 
-const cube  = new Mesh(
-  new BoxGeometry( 50, 50, 50 ),
-  new MeshLambertMaterial( { color: 0x555555 } )
-)
-cube.position.set(0, 0, 120)
-cube.receiveShadow = true
-cube.castShadow = true
+const loader = new GLTFLoader()
+async.parallel({
+  cSmall: (cb) => {
+    loader.load(cubeSmall, (gltf) => {
+      cb(null, gltf.scene)
+    }, undefined, cb)
+  },
+
+  cBig: (cb) => {
+    loader.load(cubeBig, (gltf) => {
+      cb(null, gltf.scene)
+    }, undefined, cb)
+  },
+
+}, (error, { cSmall, cBig } = {}) => {
+  cSmall.position.set( 0, 0, 50 )
+  scene.add( cSmall )
+
+  cBig.position.set( 0, 0, 50 )
+  scene.add( cBig )
+
+  const rotate = () => {
+    cSmall.rotation.z += 0.005
+    setTimeout(rotate, 10)
+  }
+  rotate()
+})
 
 const aLight = new AmbientLight( 0xFFFFFF, 0.5)
 aLight.position.set( 0, 0, 1000 )
@@ -71,30 +101,27 @@ const spLight1 = new SpotLight( 0x4FFFFFF, 0.2, 1000, 0.5, 0.1, 0.5 )
 const spLight2 = new SpotLight( 0x4FFFFFF, 0.2, 1000, 0.5, 0.1, 0.5 )
 
 spLight1.position.set( 150, 150, 300 )
-spLight1.lookAt(cube.position)
+spLight1.lookAt(floor.position)
 spLight1.castShadow = true
 
 spLight2.position.set( -150, 150, 300 )
-spLight2.lookAt(cube.position)
+spLight2.lookAt(floor.position)
 spLight2.castShadow = true
 
 const spLightHelper1 = new SpotLightHelper( spLight1 )
 const spLightHelper2 = new SpotLightHelper( spLight2 )
 
-const scene = new Scene()
 scene.add( aLight )
 // scene.add( dLight )
 scene.add( spLight1 )
 scene.add( spLight2 )
 // scene.add( spLightHelper1 )
 // scene.add( spLightHelper2 )
-scene.add( floor )
-scene.add( cube )
 
 const camera = new PerspectiveCamera(VIEW_ANGLE, ASPECT_RATIO, NEAR, FAR)
 camera.up = new Vector3( 0, 0, 1 )
-camera.position.set(150, 250, 200)
-camera.lookAt(cube.position)
+camera.position.set(66, 130, 112)
+camera.lookAt(floor.position)
 window.onkeydown = ({keyCode}) => {
   console.log('keyCode', keyCode)
   switch(keyCode) {
@@ -118,7 +145,7 @@ window.onkeydown = ({keyCode}) => {
       break
 
   }
-  camera.lookAt(cube.position)
+  console.log(camera.position)
 }
 
 const scaleFrom = { x: 1,   y: 1,   z: 1 }
@@ -127,9 +154,6 @@ const scale     = { x: 1,   y: 1,   z: 1 }
 const breathIn  = new TWEEN.Tween( scale ).easing(TWEEN.Easing.Quadratic.Out).to( scaleTo, 3500 )
 const breathOut = new TWEEN.Tween( scale ).easing(TWEEN.Easing.Quadratic.Out).to( scaleFrom, 2000 )
 const breathHandler = () => {
-  cube.scale.x = scale.x
-  cube.scale.y = scale.y
-  cube.scale.z = scale.z
 }
 breathIn.onUpdate(breathHandler)
 breathOut.onUpdate(breathHandler)
