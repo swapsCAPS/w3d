@@ -18,7 +18,7 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(['dist']),
     new ThreeWebpackPlugin(),
-    new CopyWebpackPlugin([ { from: './src/assets/*.bin', to: `${outputPath}`, flatten: true } ]),
+    new CopyWebpackPlugin([ { from: './src/assets/*.bin', to: `${outputPath}/bin`, flatten: true } ]),
 
     new HtmlWebpackPlugin({
       title: 'w3d',

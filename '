@@ -153,6 +153,8 @@ async.parallel({
 
 }, (error, { small, big, ico } = {}) => {
   if (error) return console.error(error)
+  const pLight = new THREE.PointLight( 0xffffff, 1, 100 )
+  pLight.castShadow = true
 
   const smallScene = small.scene
   console.log('small', small)
@@ -172,18 +174,16 @@ async.parallel({
   icoScene.position.set(0, 0, 50)
   icoScene.castShadow    = false
   icoScene.receiveShadow = false
-  const pLight = new THREE.PointLight( 0x2cbee7, 1, 1000 )
-  pLight.castShadow = true
-  pLight.position.set( 0, 0, 50 )
-  const pLightHelper1 = new PointLightHelper( pLight )
+  pLight.position.set(0, 0, 0)
   icoGroup.add(icoScene)
   icoGroup.add(pLight)
-  icoGroup.add(pLightHelper1)
-
   console.log('ico', ico)
   mixer.clipAction( ico.animations[0], icoGroup ).setDuration(2).play()
-  mixer.clipAction( small.animations[0], smallScene ).setDuration(4).play()
+  mixer.clipAction( small.animations[0], smallScene ).setDuration(2).play()
   scene.add( icoGroup )
+
+  console.log(smallScene)
+
 
   function animate() {
     requestAnimationFrame( animate )

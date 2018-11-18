@@ -3,9 +3,9 @@
         {
             "bufferView" : 0,
             "componentType" : 5123,
-            "count" : 288,
+            "count" : 1776,
             "max" : [
-                119
+                935
             ],
             "min" : [
                 0
@@ -15,7 +15,7 @@
         {
             "bufferView" : 1,
             "componentType" : 5126,
-            "count" : 120,
+            "count" : 936,
             "max" : [
                 25.0,
                 25.0,
@@ -31,7 +31,7 @@
         {
             "bufferView" : 2,
             "componentType" : 5126,
-            "count" : 120,
+            "count" : 936,
             "max" : [
                 1.0,
                 1.0,
@@ -47,9 +47,9 @@
         {
             "bufferView" : 3,
             "componentType" : 5126,
-            "count" : 60,
+            "count" : 120,
             "max" : [
-                19.666666666666668
+                39.666666666666664
             ],
             "min" : [
                 0.0
@@ -59,18 +59,18 @@
         {
             "bufferView" : 4,
             "componentType" : 5126,
-            "count" : 60,
+            "count" : 120,
             "max" : [
                 0.0,
                 0.0,
-                0.6977905035018921,
-                1.0
+                1.0,
+                0.9999143481254578
             ],
             "min" : [
                 0.0,
                 0.0,
-                0.0,
-                0.7163019180297852
+                0.013089596293866634,
+                -4.371138828673793e-08
             ],
             "type" : "VEC4"
         }
@@ -103,36 +103,36 @@
     "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 576,
+            "byteLength" : 3552,
             "byteOffset" : 0,
             "target" : 34963
         },
         {
             "buffer" : 0,
-            "byteLength" : 1440,
-            "byteOffset" : 576,
+            "byteLength" : 11232,
+            "byteOffset" : 3552,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 1440,
-            "byteOffset" : 2016,
+            "byteLength" : 11232,
+            "byteOffset" : 14784,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 240,
-            "byteOffset" : 3456
+            "byteLength" : 480,
+            "byteOffset" : 26016
         },
         {
             "buffer" : 0,
-            "byteLength" : 960,
-            "byteOffset" : 3696
+            "byteLength" : 1920,
+            "byteOffset" : 26496
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 4656,
+            "byteLength" : 28416,
             "uri" : "small-cube.bin"
         }
     ],
